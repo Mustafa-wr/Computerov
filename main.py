@@ -25,7 +25,15 @@ def parse_polynomial_side(side):
     """Parse one side of equation like '5 * X^0 + 4 * X^1 - 9.3 * X^2'"""
     coefficients = {}
     
-    pattern = r'([+-]?\s*[0-9]*\.?[0-9]+)\s*\*\s*X\^([0-9]+)'
+    # Step 1: Define pattern parts
+    sign_part = r'([+-]?\s*[0-9]*\.?[0-9]+)'      # Matches: +5, -9.3, 4
+    middle_part = r'\s*\*\s*X\^'                   # Matches: * X^
+    power_part = r'([0-9]+)'                       # Matches: 0, 1, 2
+    
+    # Step 2: Combine all parts into full pattern
+    pattern = sign_part + middle_part + power_part
+    
+    # Step 3: Find all matches in the text
     matches = re.findall(pattern, side)
     # print (f"Matches found: {matches}")
     
