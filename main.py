@@ -48,6 +48,10 @@ def parse_polynomial_side(side):
         coeff = float(coeff_str.replace(' ', ''))
         power = int(power_str)
         coefficients[power] = coefficients.get(power, 0) + coeff
+        # print(f"power {power}: {coeff}")
+        # print(f"coefficients[{power}]: {coefficients[power]}")
+    # print(coefficients)
+    # exit()
     return coefficients
 
 def parse_equation(equation):
@@ -69,9 +73,13 @@ def parse_equation(equation):
     # exit()
     left_coeffs = parse_polynomial_side(left_side) if left_side else {}
     right_coeffs = parse_polynomial_side(right_side) if right_side else {}
+    # print("left_coeffs =", left_coeffs)
+    # exit()
     final_coeffs = left_coeffs.copy()
     for power, coeff in right_coeffs.items():
+        # print(power ,coeff)
         final_coeffs[power] = final_coeffs.get(power, 0) - coeff
+    # print("Final coefficients:", final_coeffs)
     return final_coeffs
 
 def print_reduced_form(coeffs):
