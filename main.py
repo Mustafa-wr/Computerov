@@ -1,4 +1,5 @@
 import re
+import sys
 
 def my_sqrt(n):
     if n < 0:
@@ -10,88 +11,91 @@ def my_sqrt(n):
 
 def solve_quadratic(a, b, c):
     delta = b**2 - 4*a*c
-    print("Discriminant:", delta)
-
-    sqrt_delta = my_sqrt(delta)
-    x1 = (-b + sqrt_delta) / (2*a)
-    x2 = (-b - sqrt_delta) / (2*a)
 
     if delta > 0:
-        print("Two real solutions:")
-        print(f"x1 = {x1.real}")
-        print(f"x2 = {x2.real}")
+        sqrt_delta = my_sqrt(delta)
+        x1 = (-b + sqrt_delta) / (2*a)
+        x2 = (-b - sqrt_delta) / (2*a)
+        print("Discriminant is strictly positive, the two solutions are:")
+        print(x1)
+        print(x2)
     elif delta == 0:
-        print("One real solution:")
-        print(f"x = {x1.real}")
+        x = -b / (2*a)
+        print("Discriminant is zero, the solution is:")
+        print(x)
     else:
-        print("Two complex solutions:")
-        print(f"x1 = {x1}")
-        print(f"x2 = {x2}")
+        # Complex solutions
+        real = -b / (2*a)
+        imag = my_sqrt(-delta) / (2*a)
+        print("Discriminant is strictly negative, the two complex solutions are:")
+        print(f"{real} + {imag}i")
+        print(f"{real} - {imag}i")
 
 def parse_polynomial_side(side):
-    """Parse one side of equation like '5 * X^0 + 4 * X^1 - 9.3 * X^2'"""
     coefficients = {}
-    
-    # Step 1: Define pattern parts
-    sign_part = r'([+-]?\s*[0-9]*\.?[0-9]+)'      # Matches: +5, -9.3, 4
-    middle_part = r'\s*\*\s*X\^'                   # Matches: * X^
-    power_part = r'([0-9]+)'                       # Matches: 0, 1, 2
-    
-    # Step 2: Combine all parts into full pattern
-    pattern = sign_part + middle_part + power_part
-    
-    # Step 3: Find all matches in the text
+    pattern = r'([+-]?\s*[0-9]*\.?[0-9]+)\s*\*\s*X\^([0-9]+)'
     matches = re.findall(pattern, side)
-    # print (f"Matches found: {matches}")
-    
     for coeff_str, power_str in matches:
-        coeff = float(coeff_str.replace(' ', ''))  # Remove spaces and convert
+        coeff = float(coeff_str.replace(' ', ''))
         power = int(power_str)
-        
-        if power in coefficients:
-            coefficients[power] += coeff  # Add if same power exists
-        else:
-            coefficients[power] = coeff
-    
+        coefficients[power] = coefficients.get(power, 0) + coeff
     return coefficients
 
 def parse_equation(equation):
-    """Parse full equation like '5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0'"""
-    # Split by equals sign
     if '=' not in equation:
         raise ValueError("Invalid equation: missing '=' sign")
-    
     left_side, right_side = equation.split('=')
-
     left_coeffs = parse_polynomial_side(left_side.strip())
     right_coeffs = parse_polynomial_side(right_side.strip())
-    
-    # Move right side to left: left - right = 0
-    # So we subtract right side coefficients from left side
     final_coeffs = left_coeffs.copy()
-    
     for power, coeff in right_coeffs.items():
-        if power in final_coeffs:
-            final_coeffs[power] -= coeff
-        else:
-            final_coeffs[power] = -coeff
-    
+        final_coeffs[power] = final_coeffs.get(power, 0) - coeff
     return final_coeffs
 
-# Test the parser
-print("Testing individual sides:")
-side1 = "5 * X^0 + 4 * X^1 - 9.3 * X^2"
-result = parse_polynomial_side(side1)
-print(f"Input: {side1}")
-print(f"Parsed: {result}")
+def print_reduced_form(coeffs):
+    terms = []
+    max_power = max(coeffs.keys())
+    for p in range(max_power+1):
+        coeff = coeffs.get(p, 0)
+        terms.append(f"{coeff} * X^{p}")
+    print("Reduced form:", " + ".join(terms), "= 0")
 
-side2 = "1 * X^0"
-result2 = parse_polynomial_side(side2)
-print(f"Input: {side2}")
-print(f"Parsed: {result2}")
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("Usage: python main.py '<equation>'")
+        sys.exit(1)
 
-print("\nTesting full equation:")
-equation = "5 * X^0 + 4 * X^1 - 9.3 * X^2 = 1 * X^0"
-result3 = parse_equation(equation)
-print(f"Input: {equation}")
-print(f"Reduced: {result3}")
+    equation = sys.argv[1]
+    coeffs = parse_equation(equation)
+
+    print_reduced_form(coeffs)
+
+    # Degree detection
+    nonzero = [p for p, c in coeffs.items() if abs(c) > 1e-9]
+    if not nonzero:
+        print("Any real number is a solution.")
+        sys.exit(0)
+    degree = max(nonzero)
+
+    print(f"Polynomial degree: {degree}")
+
+    if degree > 2:
+        print("The polynomial degree is strictly greater than 2, I can't solve.")
+    elif degree == 2:
+        a = coeffs.get(2, 0)
+        b = coeffs.get(1, 0)
+        c = coeffs.get(0, 0)
+        solve_quadratic(a, b, c)
+    elif degree == 1:
+        b = coeffs.get(1, 0)
+        c = coeffs.get(0, 0)
+        if b != 0:
+            print("The solution is:")
+            print(-c / b)
+        else:
+            print("No solution.")
+    else:  # degree == 0
+        if coeffs.get(0, 0) == 0:
+            print("Any real number is a solution.")
+        else:
+            print("No solution.")
