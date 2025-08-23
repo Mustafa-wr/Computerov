@@ -1,11 +1,18 @@
-import cmath
 import re
+
+def my_sqrt(n):
+    if n < 0:
+        return None
+    x = n
+    for _ in range(10):
+        x = 0.5 * (x + n/x)
+    return x
 
 def solve_quadratic(a, b, c):
     delta = b**2 - 4*a*c
     print("Discriminant:", delta)
 
-    sqrt_delta = cmath.sqrt(delta)
+    sqrt_delta = my_sqrt(delta)
     x1 = (-b + sqrt_delta) / (2*a)
     x2 = (-b - sqrt_delta) / (2*a)
 
