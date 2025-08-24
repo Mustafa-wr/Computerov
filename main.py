@@ -80,11 +80,14 @@ def parse_equation(equation):
         # print(power ,coeff)
         final_coeffs[power] = final_coeffs.get(power, 0) - coeff
     # print("Final coefficients:", final_coeffs)
+    # exit()
     return final_coeffs
 
 def print_reduced_form(coeffs):
     terms = []
     max_power = max(coeffs.keys())
+    # print(max_power)
+    # exit()
     for p in range(max_power+1):
         coeff = coeffs.get(p, 0)
         terms.append(f"{coeff} * X^{p}")
