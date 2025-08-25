@@ -34,8 +34,8 @@ def solve_quadratic(a, b, c):
 def parse_polynomial_side(side):
     coefficients = {}
     
-    sign_part = '([+-]?\s*[0-9]*\.?[0-9]+)'      # Matches: +5, -9.3, 4
-    middle_part = '\s*\*\s*X\^'                   # Matches: * X^
+    sign_part = r'([+-]?\s*[0-9]*\.?[0-9]+)'      # Matches: +5, -9.3, 4
+    middle_part = r'\s*\*\s*X\^'                   # Matches: * X^
     power_part = '([0-9]+)'                       # Matches: 0, 1, 2
     
     pattern = sign_part + middle_part + power_part
