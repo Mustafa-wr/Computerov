@@ -34,31 +34,22 @@ def solve_quadratic(a, b, c):
 def parse_polynomial_side(side):
     coefficients = {}
     
-	# Step 1: Define pattern parts
     sign_part = '([+-]?\s*[0-9]*\.?[0-9]+)'      # Matches: +5, -9.3, 4
     middle_part = '\s*\*\s*X\^'                   # Matches: * X^
     power_part = '([0-9]+)'                       # Matches: 0, 1, 2
     
-    # Step 2: Combine all parts into full pattern
     pattern = sign_part + middle_part + power_part
     matches = re.findall(pattern, side)
-    # print(matches)
-    # exit()
     for coeff_str, power_str in matches:
         coeff = float(coeff_str.replace(' ', ''))
         power = int(power_str)
         coefficients[power] = coefficients.get(power, 0) + coeff
-        # print(f"power {power}: {coeff}")
-        # print(f"coefficients[{power}]: {coefficients[power]}")
-    # print(coefficients)
-    # exit()
     return coefficients
 
 def parse_equation(equation):
     if '=' not in equation:
         raise ValueError("Invalid equation: missing '=' sign")
-    
-    # Check for multiple equals signs
+
     if equation.count('=') > 1:
         raise ValueError("Invalid equation: multiple '=' signs")
     
@@ -66,18 +57,16 @@ def parse_equation(equation):
     left_side = left_side.strip()
     right_side = right_side.strip()
     
-    # Check for empty sides
     if not left_side and not right_side:
         raise ValueError("Invalid equation: both sides are empty")
     
-    # exit()
+
     left_coeffs = parse_polynomial_side(left_side) if left_side else {}
     right_coeffs = parse_polynomial_side(right_side) if right_side else {}
     # print("left_coeffs =", left_coeffs)
     # exit()
     final_coeffs = left_coeffs.copy()
     for power, coeff in right_coeffs.items():
-        # print(power ,coeff)
         final_coeffs[power] = final_coeffs.get(power, 0) - coeff
     # print("Final coefficients:", final_coeffs)
     # exit()
@@ -86,8 +75,6 @@ def parse_equation(equation):
 def print_reduced_form(coeffs):
     terms = []
     max_power = max(coeffs.keys())
-    # print(max_power)
-    # exit()
     for p in range(max_power+1):
         coeff = coeffs.get(p, 0)
         terms.append(f"{coeff} * X^{p}")
